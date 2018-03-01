@@ -1,0 +1,12 @@
+Nom : BALDE
+=====
+Prenom: Ahmed Tidiane
+=======
+Numéro étudiant: 3502264
+================
+
+Compte-rendu TME1 TAL:
+======================
+
+Segmentation en mots (Tokenisation):
+====================================
