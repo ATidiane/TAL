@@ -175,6 +175,7 @@ def countVectorizer(corpuspp):
 
 
 corpuspp = categorize(path2datatrain)
+print(corpus[0:50])
 
 #countingWord, word = countWords(corpuspp), 'the'
 #print("Nombre d'occurences du mot {}: ".format(word), countingWord[word])
