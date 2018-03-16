@@ -18,13 +18,13 @@ def decorator_unicode(fonc):
         return unicode(doc, 'utf-8')
     return unicode_vec
 
-def characters(doc):
+def characters(doc, charac):
     """ Fonction eliminant les caractères présents dans charac
         au document doc
         :param doc: liste de characters
         :return: the new doc
     """
-    return doc.translate(str.maketrans(doc, ' ' * len(doc)))
+    return doc.translate(str.maketrans(charac, ' ' * len(charac)))
 
 @decorator_unicode
 def normalize(doc):
