@@ -3,6 +3,7 @@
 import re
 import string
 import codecs
+import nltk
 import numpy as np
 from collections import *
 import sklearn.naive_bayes as nb
@@ -28,11 +29,19 @@ path2test = "corpus.tache1.test.utf8"
 class LemmaTokenizer(object):
     def __init__(self):
         self.wnl = WordNetLemmatizer()
-        self.snowball_stemmer = SnowballStemmer('french')
-        #self.snowball_stemmer.stem(t)
+
     def __call__(self, doc):
         return [self.wnl.lemmatize(t) for t in word_tokenize(doc)]
 
+    
+class SnowballTokenizer(object):
+    def __init__(self):
+        self.snowball_stemmer = SnowballStemmer('french')
+
+    def __call__(self, doc):
+        return [self.snowball_stemmer.stem(t) for t in word_tokenize(doc)]
+
+    
 def readfile(path):
     """
     """
@@ -64,7 +73,7 @@ def countCM(path):
     return chirac.shape, mitterand.shape
 
 
-punc = string.punctuation
+
 languages = ['french', 'english', 'german', 'spanish']
 stop_words = []
 for l in languages:
@@ -75,17 +84,27 @@ text_clf = Pipeline([('vect', txt.CountVectorizer(encoding=u'utf-8',
                                                   strip_accents=u'ascii',
                                                   lowercase=True, analyzer=u'word',
                                                   binary=True, vocabulary=None,
-                                                  preprocessor=None)),
-                     ('tfidf', txt.TfidfTransformer()),
-                     ('clf', lin.LogisticRegression(n_jobs=-1)),
+                                                  preprocessor=None,
+                                                  ngram_range=(1, 2),
+                                                  stop_words=None,
+                                                  tokenizer=SnowballTokenizer(),
+                                                  max_features=None)),
+                    ('tfidf', txt.TfidfTransformer(use_idf=False)),
+                    ('clf', lin.LogisticRegression(n_jobs=-1)),
 ])
 
-parameters = {'vect__ngram_range': [(1, 1), (1, 2)],
-              'tfidf__use_idf': (True, False),
-              'vect__stop_words': (stop_words, None),
-              'vect__tokenizer': (LemmaTokenizer(), None),
-              'vect__max_features': (10000, 20000, 30000, 40000, 50000),
-}
+
+# parameters = {'tfidf__use_idf': (True, False),
+#               'vect__tokenizer': (LemmaTokenizer(), SnowballTokenizer(), None),
+# }
+
+
+# parameters = {'vect__ngram_range': [(1, 1), (1, 2)],
+#               'tfidf__use_idf': (True, False),
+#               'vect__stop_words': (stop_words, None),
+#               'vect__tokenizer': (LemmaTokenizer(), None),
+#               'vect__max_features': (10000, 20000, 30000, 40000, 50000),
+# }
 
 databrut, datax, datay = readfile(path2train)
 datay = processing_datay(datay)
@@ -93,16 +112,16 @@ all_words = databrut.split()
 
 databrut_test, datax_t, datay_t = readfile(path2test)
 
-gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
+#gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
 
-gs_clf = gs_clf.fit(datax, datay)
+gs_clf = text_clf.fit(datax, datay)
 
-prediction = gs_clf.predict(datax_t) # usage sur une nouvelle donnée
+prediction = text_clf.predict(datax_t) # usage sur une nouvelle donnée
 
-gs_clf.best_score_                                  
+#gs_clf.best_score_                                  
 
-for param_name in sorted(parameters.keys()):
-    print("%s: %r" % (param_name, gs_clf.best_params_[param_name]))
+# for param_name in sorted(parameters.keys()):
+#     print("%s: %r" % (param_name, gs_clf.best_params_[param_name]))
 
 
 cleaned_prediction = []
