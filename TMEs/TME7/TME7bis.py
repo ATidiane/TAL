@@ -11,7 +11,7 @@ from sklearn import svm
 from sklearn import linear_model as lin
 import sklearn.feature_extraction.text as txt
 from nltk.corpus import stopwords
-from nltk import word_tokenize          
+from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.stem import SnowballStemmer
 from sklearn.pipeline import Pipeline
@@ -22,7 +22,7 @@ path2train = "corpus.tache1.learn.utf8"
 path2test = "corpus.tache1.test.utf8"
 
 
-# Pour changer le path du nltk_data, très très important 
+# Pour changer le path du nltk_data, très très important
 #nltk.data.path.append("/Infos/nltk/nltk_data")
 
 
@@ -33,7 +33,7 @@ class LemmaTokenizer(object):
     def __call__(self, doc):
         return [self.wnl.lemmatize(t) for t in word_tokenize(doc)]
 
-    
+
 class SnowballTokenizer(object):
     def __init__(self):
         self.snowball_stemmer = SnowballStemmer('french')
@@ -41,7 +41,7 @@ class SnowballTokenizer(object):
     def __call__(self, doc):
         return [self.snowball_stemmer.stem(t) for t in word_tokenize(doc)]
 
-    
+
 def readfile(path):
     """
     """
@@ -106,9 +106,9 @@ text_clf = Pipeline([('vect', txt.CountVectorizer(encoding=u'utf-8',
 #               'vect__max_features': (10000, 20000, 30000, 40000, 50000),
 # }
 
-databrut, datax, datay = readfile(path2train)
 datay = processing_datay(datay)
 all_words = databrut.split()
+databrut, datax, datay = readfile(path2train)
 
 databrut_test, datax_t, datay_t = readfile(path2test)
 
@@ -118,7 +118,7 @@ gs_clf = text_clf.fit(datax, datay)
 
 prediction = text_clf.predict(datax_t) # usage sur une nouvelle donnée
 
-#gs_clf.best_score_                                  
+#gs_clf.best_score_
 
 # for param_name in sorted(parameters.keys()):
 #     print("%s: %r" % (param_name, gs_clf.best_params_[param_name]))
