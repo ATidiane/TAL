@@ -13,7 +13,10 @@ from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.stem import SnowballStemmer
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 464cffd19d8abf01ab42503fa84ae8e9d6ec25cd
 path2train = "corpus.tache1.learn.utf8"
 path2test = "corpus.tache1.test.utf8"
 
