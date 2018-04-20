@@ -13,6 +13,7 @@ from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.stem import SnowballStemmer
 
+<<<<<<< HEAD
 
 def readfile(path):
     """ Reads the file in the given path, then returns a string which contains
@@ -33,6 +34,17 @@ def readfile(path):
         
     return one, datax, np.array(datay, int)
 
+||||||| merged common ancestors
+path2train = "corpus.tache1.learn.utf8"
+path2test = "corpus.tache1.test.utf8"
+=======
+<<<<<<< HEAD
+
+=======
+>>>>>>> 464cffd19d8abf01ab42503fa84ae8e9d6ec25cd
+path2train = "corpus.tache1.learn.utf8"
+path2test = "corpus.tache1.test.utf8"
+>>>>>>> 58e23cdfeb37ebf467a0e34ae394ee6f6f1f198e
 
 class LemmaTokenizer(object):
     """ Lematize the data in WordNet's way
