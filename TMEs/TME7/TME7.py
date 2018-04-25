@@ -15,18 +15,57 @@ from nltk.stem import SnowballStemmer
 
 <<<<<<< HEAD
 
+def readfile(path):
+    """ Reads the file in the given path, then returns a string which contains
+        all the text, a numpy array text data for each sentence and finally the 
+        corresponding labels "?:?:C" or "?:?:M".
+    """
+    with open(path, "r") as f:
+        punc = string.punctuation
+        one = f.read()
+        databrut = one.split("\n")[:-1]
+        data = np.array([d.split(' ', 1) for d in databrut])
+        
+        datax = np.array([d[-1] for d in data])
+        
+        datay = np.array([d[0] for d in data])
+        datay = [re.sub('.*<[0-9]*:[0-9]*:C>', '0', dy) for dy in datay]
+        datay = [re.sub('.*<[0-9]*:[0-9]*:M>', '1', dy) for dy in datay]
+        
+    return one, datax, np.array(datay, int)
+
+||||||| merged common ancestors
+path2train = "corpus.tache1.learn.utf8"
+path2test = "corpus.tache1.test.utf8"
+=======
+<<<<<<< HEAD
+
 =======
 >>>>>>> 464cffd19d8abf01ab42503fa84ae8e9d6ec25cd
 path2train = "corpus.tache1.learn.utf8"
 path2test = "corpus.tache1.test.utf8"
+>>>>>>> 58e23cdfeb37ebf467a0e34ae394ee6f6f1f198e
 
 class LemmaTokenizer(object):
+    """ Lematize the data in WordNet's way
+    """
     def __init__(self):
         self.wnl = WordNetLemmatizer()
-        self.snowball_stemmer = SnowballStemmer('french')
-        #self.snowball_stemmer.stem(t)
+
     def __call__(self, doc):
         return [self.wnl.lemmatize(t) for t in word_tokenize(doc)]
+
+
+class SnowballTokenizer(object):
+    """ Lematize the data in Snowball's way, the best way actually, cause we
+        have the option to specify the language
+    """
+    def __init__(self):
+        self.snowball_stemmer = SnowballStemmer('french')
+
+    def __call__(self, doc):
+        return [self.snowball_stemmer.stem(t) for t in word_tokenize(doc)]
+
 
 def removeCharacters(doc, charac):
     """ Fonction eliminant les caractères présents dans charac
@@ -40,37 +79,19 @@ def removeCharacters(doc, charac):
 def removeNum(doc):
     """ Elimination des chiffres
     """
-    return re.sub('[0-9]+', '', doc) # remplacer une séquence de chiffres par rien
+    return re.sub('[0-9]+', '', doc)
 
 
-def readfile(path):
+def countCM(path):
     """
     """
-    with open(path, "r") as f:
-        punc = string.punctuation
-        one = f.read()
-        databrut = one.split("\n")
-        data = np.array([d.split(' ', 1) for d in databrut])
-        datay = np.array([d[0] for d in data])
-        datax = np.array([d[-1] for d in data])
-
-    return one, datax[:-1], datay[:-1]
-
-def processing_datay(datay):
-    """
-    """
-    datay = [re.sub('.*<[0-9]*:[0-9]*:C>', '0', dy) for dy in datay]
-    datay = [re.sub('.*<[0-9]*:[0-9]*:M>', '1', dy) for dy in datay]
-    # -1 cause the last one is equal to ''
-    return np.array(datay, int)
-
-def verif(path):
     with open(path, 'r') as f:
         d = np.array(f.read().split("\n"))
         chirac = np.where(d == 'C')[0]
         mitterand = np.where(d == 'M')[0]
 
     return chirac.shape, mitterand.shape
+
 
 def mycountVectorizer(corpuspp):
 
@@ -87,7 +108,7 @@ def mycountVectorizer(corpuspp):
     max_df=1.0                                                    # default
     # mots apparaissant plus de 5 fois
     
-    max_features = 50000
+    max_features = 25000
     binary=True                                                   # presence coding
     strip_accents = u'ascii'                                      # {‘ascii’, ‘unicode’, None}
 
@@ -114,10 +135,9 @@ def myTfidfVectorizer(corpuspp):
     return vec
 
 
-
-
 def getCM(datax, datay):
-    """
+    """ Creates a numpy text data for mitterand sentences and a separated one 
+        for chirac's
     """
     indexes_c = np.where(datay == 0)[0]
     indexes_m = np.where(datay == 1)[0]
@@ -126,54 +146,69 @@ def getCM(datax, datay):
     return data_c, data_m
 
 
-#=========================================== Train
+def storePredictions(predictions, filename):
+    """ Stores the predicted values in a given name file
+    """
+    cleaned_prediction = []
+    for label in prediction:
+        cleaned_prediction.append("C" if label == 0 else "M")
 
-databrut, datax, datay = readfile(path2train)
-datay = processing_datay(datay)
-all_words = databrut.split()
-vec = mycountVectorizer(all_words)
-nature = txt.CountVectorizer()
-corpus = nature.fit_transform(datax)
-#tfidf = myTfidfVectorizer(all_words)
-#corpus = tfidf.fit_transform(datax)
-X = corpus.toarray()
-y = np.array(datay)
-
-print(X.shape, y.shape)
-
-vocabulary = nature.vocabulary_
-
-#=========================================== Test
-
-databrut_test, datax_t, datay_t = readfile(path2test)
-X_test = nature.transform(datax_t).toarray()
-
-print(X_test.shape)
-
-print(vocabulary)
-#=========================================== Learning
-
-# SVM
-#clf = svm.LinearSVC()
-
-# Naive Bayes
-clf = nb.MultinomialNB()
-
-# regression logistique
-#clf = lin.LogisticRegression(n_jobs=-1)
-
-# apprentissage
-clf.fit(X, y) 
-prediction = clf.predict(X_test) # usage sur une nouvelle donnée
-
-cleaned_prediction = []
-for label in prediction:
-    cleaned_prediction.append("C" if label == 0 else "M")
-
-with open("SORTIE2.txt", "w") as file:
-    file.write("\n".join(cleaned_prediction))
-    file.write("\nC\n")
+    with open(filename, "w") as file:
+        file.write("\n".join(cleaned_prediction))
+        file.write("\nC\n")
 
 
-print("verif : ", verif("SORTIE.txt"))
-print("verif : ", verif("SORTIE2.txt"))
+def main():
+    """ Fonctions that stores everything we want to call in main.
+    """
+
+    path2train = "corpus.tache1.learn.utf8"
+    path2test = "corpus.tache1.test.utf8"
+
+    #=========================================== Train
+
+    databrut, datax, datay = readfile(path2train)
+    datay = processing_datay(datay)
+    all_words = databrut.split()
+    vec = mycountVectorizer(all_words)
+    nature = txt.CountVectorizer()
+    corpus = nature.fit_transform(datax)
+    #tfidf = myTfidfVectorizer(all_words)
+    #corpus = tfidf.fit_transform(datax)
+    X = corpus.toarray()
+    y = np.array(datay)
+    
+    print(X.shape, y.shape)
+    
+    vocabulary = nature.vocabulary_
+    
+    #=========================================== Test
+    
+    databrut_test, datax_t, datay_t = readfile(path2test)
+    X_test = nature.transform(datax_t).toarray()
+    
+    print(X_test.shape)
+    
+    print(vocabulary)
+    #=========================================== Learning
+
+    # SVM
+    #clf = svm.LinearSVC()
+    
+    # Naive Bayes
+    clf = nb.MultinomialNB()
+    
+    # regression logistique
+    #clf = lin.LogisticRegression(n_jobs=-1)
+
+    # apprentissage
+    clf.fit(X, y) 
+    prediction = clf.predict(X_test) # usage sur une nouvelle donnée
+
+
+    print("verif : ", countCM("SORTIE.txt"))
+    print("verif : ", countCM("SORTIE2.txt"))
+
+
+if __name__=="__main__":
+    main()
