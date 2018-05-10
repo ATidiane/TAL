@@ -9,8 +9,8 @@ import nltk.corpus.reader as pt
 import sklearn.feature_extraction.text as txt
 from nltk.corpus import stopwords
 
-path2datatrain = u'/Users/ahmedtidianebalde/Documents/TAL/TMEs/TME6/20news-bydate/20news-bydate-train/'
-path2datatest = u'/Users/ahmedtidianebalde/Documents/TAL/TMEs/TME6/20news-bydate/20news-bydate-test/'
+path2datatrain = u'20news-bydate/20news-bydate-train/'
+path2datatest = u'20news-bydate/20news-bydate-test/'
 
 
 def decorator_unicode(fonc):
