@@ -8,35 +8,25 @@ from collections import *
 import nltk
 import numpy as np
 import sklearn.feature_extraction.text as txt
-import sklearn.naive_bayes as nb
-from nltk import word_tokenize
 from nltk.corpus import stopwords
-from nltk.stem import SnowballStemmer, WordNetLemmatizer
-from sklearn import linear_model as lin
-from sklearn import svm
-from sklearn.model_selection import GridSearchCV
+from nltk import word_tokenize          
+from nltk.stem import WordNetLemmatizer
+from nltk.stem import SnowballStemmer
 from sklearn.pipeline import Pipeline
+from sklearn.model_selection import GridSearchCV
 
 path2train = "corpus.tache1.learn.utf8"
 path2test = "corpus.tache1.test.utf8"
 
-
-# Pour changer le path du nltk_data, très très important
+# Pour changer le path du nltk_data, très très important 
 nltk.data.path.append("/Infos/nltk/nltk_data")
-
-# Pour changer le path du nltk_data, très très important
-# nltk.data.path.append("/Infos/nltk/nltk_data")
-
 
 class LemmaTokenizer(object):
     def __init__(self):
         self.wnl = WordNetLemmatizer()
         self.snowball_stemmer = SnowballStemmer('french')
-        # self.snowball_stemmer.stem(t)
-
-    def __call__(self, doc):
-        return [self.wnl.lemmatize(t) for t in word_tokenize(doc)]
-
+        #self.snowball_stemmer.stem(t)
+        
     def __call__(self, doc):
         return [self.wnl.lemmatize(t) for t in word_tokenize(doc)]
 
@@ -122,13 +112,15 @@ gs_clf.best_score_
 
 for param_name in sorted(parameters.keys()):
     print("%s: %r" % (param_name, gs_clf.best_params_[param_name]))
-                                                  preprocessor = None,
-                                                  ngram_range = (1, 2),
-                                                  stop_words = None,
-                                                  tokenizer = SnowballTokenizer(),
-                                                  max_features = None)),
-                    ('tfidf', txt.TfidfTransformer(use_idf = False)),
-                    ('clf', lin.LogisticRegression(n_jobs = -1)),
+
+txt_clf = Pipeline([('vect', txt.CountVectorizer(encoding=u'utf-8',
+                                                  preprocessor=None,
+                                                  ngram_range=(1, 2),
+                                                  stop_words=None,
+                                                  tokenizer=SnowballTokenizer(),
+                                                  max_features=None)),
+                    ('tfidf', txt.TfidfTransformer(use_idf=False)),
+                    ('clf', lin.LogisticRegression(n_jobs=-1)),
 ])
 
 
