@@ -37,4 +37,7 @@ def words_ngrams():
 if __name__=="__main__":
     words_text, tags_text = words_categories()
     all_ngrams = ngrammes(words_text, 2)
-    print(all_ngrams[0])
+    print(all_ngrams[0])        
+
+
+    
