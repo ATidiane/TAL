@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Feb 22 16:01:45 2018
-
-@author: 3502264
-"""
 
 import tkinter
+import tkinter.ttk as ttk
 from tkinter import *
 from tkinter.filedialog import askopenfilename
+
+from globalVariables import *
 
 
 class Opening(tkinter.Tk):
@@ -17,7 +15,7 @@ class Opening(tkinter.Tk):
         tkinter.Tk.__init__(self, parent)
         self.parent = parent
         self.title = "ExtractMWU"
-        self.geometry("300x300")
+        self.geometry("300x500")
         self.bgColor = "#880E4F"
         self.bgButton = "#FF9800"
         self.main()
@@ -29,6 +27,7 @@ class Opening(tkinter.Tk):
         for widget in self.winfo_children():
             widget.pack_forget()
             widget.place_forget()
+            widget.destroy()
 
     def quitter(self):
         self.destroy()
@@ -56,6 +55,12 @@ class Opening(tkinter.Tk):
     def appendText(self, T, text):
         T.insert(END, text, 'color')
 
+    def addCombobox(self, s, textvariable, values, state='readonly',
+                    background="white", height=20, width=20):
+        return ttk.Combobox(s, textvariable=textvariable, values=values,
+                            state=state, background=background,
+                            height=height, width=width)
+
     def OpenFile(self):
         fileName = askopenfilename(initialdir=".",
                                    filetypes=(("Text File", "*.txt"),
@@ -69,7 +74,11 @@ class Opening(tkinter.Tk):
 
     def realWindow(self):
         self.destroyFrame()
+        self.history.append("realWindow()")
         self.geometry("900x600")
+        self.addLabel(self, "ExtractMWU")
+        self.addButtonPlace(self, "back", command=self.main, width=5,
+                            relx=.05, rely=.05)
         T = Text(self, height=40, width=70, borderwidth=0)
         scroll = Scrollbar(self, command=T.yview)
         T.configure(yscrollcommand=scroll.set)
@@ -78,12 +87,29 @@ class Opening(tkinter.Tk):
         scroll.pack(side=RIGHT, fill=Y)
         T.pack(side=RIGHT)
         self.appendText(T, self.fichier.read())
+        self.addButtonPlace(self, "Quit", command=self.quitter,
+                            width=5, relx=.94, rely=.95)
 
     def main(self):
+        self.destroyFrame()
+        self.geometry("300x350")
+        self.history = ["main()"]
         self.addLabel(self, "Welcome\nto ExtractMWU")
         self.chooseF = self.addFrame(self, BOTTOM)
+
+        self.addLabel(self.chooseF, "Choose NLTK Corpus")
+        choose_corpus = self.addCombobox(
+            self.chooseF,
+            textvariable=StringVar(),
+            values=nltk_corpus)
+        choose_corpus.set("Choose Nltk Corpus")
+        choose_corpus.pack()
+
+        self.addLabel(self.chooseF, "OR")
+
         self.addButtonPlace(self.chooseF, "Choose a file",
                             command=self.OpenFile)
+
         self.addButtonPlace(self.chooseF, "Quit",
                             command=self.quitter, rely=0.8)
 

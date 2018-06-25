@@ -35,7 +35,6 @@ def ngrammes(words_text, n):
 
 
 def words_ngrams():
-
     pass
 
 
